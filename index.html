@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<audio id="pingMp3" src="https://maxw.com/pingmp3"></audio>
+<div style="background-color: #333333; width: 640px;">
+	<canvas id="gameCanvas" width="640" height="480"></canvas>
+</div>
+<script>
+	var ctx=gameCanvas.getContext("2d");
+	var x=280, y=400, speedx=0, speedy=-8,batx=280, score=0;
+	drawBricks();
+	function drawBricks(){
+		for(a=0;a<5; a++){
+			for(b=0; b<8; b++){
+				ctx.fillStyle='#ff00'+(40+a*40).toString(16);
+				ctx.fillRect(b*80,100+a*20,79,19);
+			}
+		}
+	}
+	var gameTimer=setInterval(mainLoop, 25);
+	function mainLoop(){
+		ctx.clearRect(x,y,7,7);
+		x=x+speedx;
+		y=y+speedy;
+		checkforhits();
+		ctx.fillStyle='#ffffff';
+        ctx.fillRect(x,y,7,7);
+        if((x>620)||(x<0))speedx=-speedx;
+        if (y<10)speedy=8;
+        if(y>480){gameover();}
+        ctx.clearRect(0,460,640,20);
+        ctx.fillStyle='#cccccc';
+        ctx.fillRect(batx-60,460,120,20);
+	}
+	function checkforhits(){
+		var col=ctx.getImageData(x,y,1,1).data;
+		if ((y>460)&&(Math.abs(batx-x)<60)){
+			speedy=-8;
+			speedx=Math.round(0.15*(x-batx));
+		}else if(col[3]!=0){
+			pingMp3.currentTime=0;
+			pingMp3.play();
+            var x0=80*Math.floor(x/80);
+            var y0=20*Math.floor(y/20);
+            ctx.clearRect(x0,y0,79,19);
+            speedy=-speedy;
+            score++;
+            ctx.fillRect(0,0,640,20);
+            ctx.fillStyle='black';
+            ctx.font="20px Arial";
+            ctx.fillText("Score:"+score,2,16);
+          
+		}
+	}
+	document.onmousemove=function(){batx=event.clientX;}
+	function gameover(){
+		clearInterval(gameTimer);
+		ctx.font="80px Arial";
+		ctx.fillText("Game Over!",100,250);
+	}
+</script>
+</html>
